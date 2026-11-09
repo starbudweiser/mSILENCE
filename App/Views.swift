@@ -146,21 +146,22 @@ struct BlockedRow: View {
     let paused: Bool
     let onToggle: (Bool) -> Void
     let onRemove: () -> Void
+    static let rowHeight: CGFloat = 58
     var body: some View {
-        HStack(spacing: Socle.M.space3) {
+        HStack(alignment: .center, spacing: Socle.M.space3) {
             Toggle("", isOn: Binding(get: { app.enabled }, set: onToggle))
                 .labelsHidden().toggleStyle(.switch).controlSize(.small).tint(Socle.C.accentFill)
             Image(nsImage: Icons.icon(app.path)).resizable().frame(width: 32, height: 32).opacity(app.exists ? 1 : 0.4)
             VStack(alignment: .leading, spacing: 2) {
                 Text(app.name).socle(Socle.T.label).foregroundStyle(Socle.C.textStrong)
-                Text(app.path).socle(Socle.T.meta).foregroundStyle(app.exists ? Socle.C.accentText : Socle.C.warning)
-                    .lineLimit(1).truncationMode(.middle)
-                if !app.exists { Text(L("blocked.missing")).socle(Socle.T.meta).foregroundStyle(Socle.C.warning) }
+                Text(app.exists ? app.path : "\(L("blocked.missing")) · \(app.path)").socle(Socle.T.meta)
+                    .foregroundStyle(app.exists ? Socle.C.accentText : Socle.C.warning).lineLimit(1).truncationMode(.middle)
             }
             Spacer(minLength: Socle.M.space3)
             Button(L("blocked.delete"), action: onRemove).buttonStyle(SocleButtonStyle(.secondary, height: Socle.M.sizeControl)).fixedSize()
         }
-        .padding(.horizontal, Socle.M.space4).padding(.vertical, Socle.M.space2_5)
+        .padding(.horizontal, Socle.M.space4)
+        .frame(height: Self.rowHeight)   // même hauteur pour toutes les lignes, contenu centré
         .opacity(app.enabled && !paused ? 1 : 0.55)
     }
 }
@@ -282,7 +283,8 @@ struct MonitorView: View {
                 Button(L("monitor.block")) { rules.add([g.path]) }.buttonStyle(SocleButtonStyle(.primary, height: Socle.M.sizeControl)).fixedSize()
             }
         }
-        .padding(.horizontal, Socle.M.space4).padding(.vertical, Socle.M.space2_5)
+        .padding(.horizontal, Socle.M.space4)
+        .frame(height: BlockedRow.rowHeight)
     }
 }
 
