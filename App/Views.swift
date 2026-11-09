@@ -117,24 +117,34 @@ struct Sidebar: View {
 }
 
 /// Motif de l'icône (ondes barrées) sans son carré de fond, d'une seule teinte : `text-strong` à 5 %.
+/// Image modèle dessinée une fois (alpha seul) : l'opacité s'applique d'un bloc, sans surépaisseur là où les traits se croisent.
 struct Watermark: View {
-    var body: some View {
-        Canvas { ctx, size in
-            let k = size.width / 1024
-            func pt(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: x * k, y: (1024 - y) * k) }
-            let c = pt(512, 330)
-            var path = Path()
+    private static let image: NSImage = {
+        let img = NSImage(size: NSSize(width: 1024, height: 1024), flipped: false) { _ in
+            guard let cg = NSGraphicsContext.current?.cgContext else { return false }
+            cg.setLineCap(.round)
+            cg.setStrokeColor(NSColor.black.cgColor); cg.setFillColor(NSColor.black.cgColor)
+            let c = CGPoint(x: 512, y: 330)
             for r in [110.0, 255.0, 400.0] as [CGFloat] {
-                path.addArc(center: c, radius: r * k, startAngle: .degrees(-90 - 50.4), endAngle: .degrees(-90 + 50.4), clockwise: false)
+                cg.setLineWidth(70)
+                cg.addArc(center: c, radius: r, startAngle: .pi / 2 - 0.88, endAngle: .pi / 2 + 0.88, clockwise: false)
+                cg.strokePath()
             }
-            ctx.stroke(path, with: .color(.white), style: StrokeStyle(lineWidth: 70 * k, lineCap: .round))
-            ctx.fill(Path(ellipseIn: CGRect(x: c.x - 52 * k, y: c.y - 52 * k, width: 104 * k, height: 104 * k)), with: .color(.white))
-            var slash = Path(); slash.move(to: pt(270, 760)); slash.addLine(to: pt(754, 270))
-            ctx.stroke(slash, with: .color(.white), style: StrokeStyle(lineWidth: 66 * k, lineCap: .round))
+            cg.fillEllipse(in: CGRect(x: c.x - 52, y: c.y - 52, width: 104, height: 104))
+            let a = CGPoint(x: 270, y: 760), b = CGPoint(x: 754, y: 270)
+            cg.setBlendMode(.clear); cg.setLineWidth(150)          // vide autour de la barre, comme sur l'icône
+            cg.move(to: a); cg.addLine(to: b); cg.strokePath()
+            cg.setBlendMode(.normal); cg.setLineWidth(66)
+            cg.move(to: a); cg.addLine(to: b); cg.strokePath()
+            return true
         }
-        .compositingGroup()
-        .colorMultiply(Socle.C.textStrong)
-        .opacity(0.05)
+        img.isTemplate = true
+        return img
+    }()
+
+    var body: some View {
+        Image(nsImage: Self.image).renderingMode(.template).resizable()
+            .foregroundStyle(Socle.C.textStrong).opacity(0.05)
     }
 }
 
@@ -374,7 +384,6 @@ struct SettingsView: View {
     @ObservedObject var rules: RuleStore
     @ObservedObject var fw: FirewallController
     @AppStorage("autoUpdate") private var autoUpdate = true
-    @State private var importMessage: String?
 
     var body: some View {
         ScrollView {
@@ -391,17 +400,6 @@ struct SettingsView: View {
                         }
                     }
                     Text(L("settings.firewall.hint")).socle(Socle.T.body).foregroundStyle(Socle.C.accentText)
-                }
-                card(L("settings.import")) {
-                    Text(L("settings.import.hint")).socle(Socle.T.body).foregroundStyle(Socle.C.accentText)
-                    HStack {
-                        Button(L("settings.import.button")) {
-                            if let list = RadioSilenceImport.blacklist() {
-                                importMessage = L("settings.import.done", rules.add(list), list.count)
-                            } else { importMessage = L("settings.import.none") }
-                        }.buttonStyle(SocleButtonStyle(.secondary, height: Socle.M.sizeControl)).fixedSize()
-                        if let importMessage { Text(importMessage).socle(Socle.T.body).foregroundStyle(Socle.C.success) }
-                    }
                 }
                 card(L("settings.updates")) {
                     Toggle(isOn: $autoUpdate) { Text(L("settings.updates.auto")).socle(Socle.T.body).foregroundStyle(Socle.C.text) }

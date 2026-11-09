@@ -33,11 +33,6 @@
 "settings.firewall.hint" = "Il filtro lavora in background, senza finestre né notifiche, anche con mSILENCE chiuso. Nessun dato lascia questo Mac.";
 "settings.install" = "Installa il filtro di rete";
 "settings.disable" = "Disattiva il filtro di rete";
-"settings.import" = "Radio Silence";
-"settings.import.hint" = "Importa l'elenco di app bloccate di Radio Silence. La sua licenza e le altre impostazioni non vengono importate e nulla viene modificato in Radio Silence.";
-"settings.import.button" = "Importa la configurazione di Radio Silence";
-"settings.import.done" = "%d nuova/e app aggiunta/e su %d trovata/e.";
-"settings.import.none" = "Nessuna configurazione di Radio Silence trovata su questo Mac.";
 "settings.updates" = "Aggiornamenti";
 "settings.updates.auto" = "Installa automaticamente gli aggiornamenti";
 "menu.updates" = "Verifica aggiornamenti…";
