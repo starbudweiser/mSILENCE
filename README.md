@@ -20,7 +20,7 @@ mSILENCE is a personal, independent per-app firewall and network monitor for mac
 Requires macOS 14+, Xcode and [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`).
 
 ```bash
-./build_app.sh    # builds mSILENCE.app (Developer ID), installs it in ~/Applications/Applications Personnelles
+./build_app.sh    # builds mSILENCE.app (Developer ID), installs it in /Applications (macOS only activates a system extension from there)
 ```
 
 A network content filter needs Apple-signed entitlements, so the build is signed with a Developer ID profile that includes the *Network Extensions* capability (team `35KLMK53PN`, to be changed in `project.yml`, `build_app.sh` and `scripts/ExportOptions.plist`). `NO_INSTALL=1` skips the installation.

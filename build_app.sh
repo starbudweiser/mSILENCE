@@ -1,6 +1,6 @@
 #!/bin/bash
 # Compile mSILENCE.app (appli + extension réseau), signée Developer ID (équipe 35KLMK53PN) et installée.
-# Usage : ./build_app.sh   (NO_INSTALL=1 pour ne pas l'installer ; produit build/export/mSILENCE.app)
+# Usage : ./build_app.sh   (NO_INSTALL=1 pour ne pas l'installer, NO_NOTARIZE=1 pour sauter la notarisation ; produit build/export/mSILENCE.app)
 #
 # Pourquoi cette chaîne : l'extension réseau (filtre de contenu) exige des droits Apple liés à un profil d'approvisionnement.
 # Xcode ne crée le profil « Developer ID » que si l'archive porte déjà ces droits : on archive sans signature, on pose une
@@ -10,7 +10,8 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 TOOLS=/Volumes/SKYRIM/TOOLS
-DEST="${MSILENCE_INSTALL_DIR:-$HOME/Applications/Applications Personnelles}"
+# Exception à la règle « Applications Personnelles » : macOS n'active une extension système que si l'appli est dans /Applications.
+DEST="${MSILENCE_INSTALL_DIR:-/Applications}"
 VERSION="${VERSION:-1.0.0}"
 BUILD="$(git rev-list --count HEAD 2>/dev/null || echo 1)"
 
@@ -34,6 +35,14 @@ codesign --force -s - --options runtime --entitlements App/mSILENCE.entitlements
 xcodebuild -exportArchive -archivePath build/mSILENCE.xcarchive -exportPath build/export \
     -exportOptionsPlist scripts/ExportOptions.plist -allowProvisioningUpdates -quiet
 codesign --verify --deep --strict build/export/mSILENCE.app
+
+# macOS n'active l'extension système que d'une appli notarisée (sinon « code signature invalid »).
+# On notarise l'export tel quel (notarize_app.sh re-signerait l'appli et perdrait les droits liés au profil).
+if [ "${NO_NOTARIZE:-0}" != 1 ]; then
+    ditto -c -k --keepParent build/export/mSILENCE.app build/notarize.zip
+    xcrun notarytool submit build/notarize.zip --keychain-profile "${NOTARY_PROFILE:-Applications}" --wait
+    xcrun stapler staple build/export/mSILENCE.app
+fi
 echo "OK : build/export/mSILENCE.app"
 
 if [ "${NO_INSTALL:-0}" != 1 ]; then

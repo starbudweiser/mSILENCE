@@ -5,11 +5,10 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 VERSION="${1:?Usage : scripts/release.sh <version>}"
-NOTARIZE=/Volumes/SKYRIM/TOOLS/MAC/_tools/notarize_app.sh
 DIST="$(mktemp -d)"
 
-VERSION="$VERSION" NO_INSTALL=1 ./build_app.sh
-DIST="$DIST" "$NOTARIZE" build/export/mSILENCE.app
+VERSION="$VERSION" NO_INSTALL=1 ./build_app.sh   # notarise et agrafe (notarize_app.sh re-signerait l'appli et perdrait les droits du profil)
+(cd build/export && ditto -c -k --keepParent mSILENCE.app "$DIST/mSILENCE.zip")
 (cd "$DIST" && shasum -a 256 mSILENCE.zip > mSILENCE.zip.sha256)
 python3 /Volumes/SKYRIM/TOOLS/MAC/_tools/release_notes.py mSILENCE "$VERSION" --sha "$DIST/mSILENCE.zip.sha256" -o "$DIST/notes.md"
 gh release create "v$VERSION" "$DIST/mSILENCE.zip" "$DIST/mSILENCE.zip.sha256" --title "mSILENCE $VERSION" --notes-file "$DIST/notes.md"
