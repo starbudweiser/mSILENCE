@@ -1,0 +1,45 @@
+#!/bin/bash
+# Compile mSILENCE.app (appli + extension réseau), signée Developer ID (équipe 35KLMK53PN) et installée.
+# Usage : ./build_app.sh   (NO_INSTALL=1 pour ne pas l'installer ; produit build/export/mSILENCE.app)
+#
+# Pourquoi cette chaîne : l'extension réseau (filtre de contenu) exige des droits Apple liés à un profil d'approvisionnement.
+# Xcode ne crée le profil « Developer ID » que si l'archive porte déjà ces droits : on archive sans signature, on pose une
+# signature ad hoc avec les droits, puis l'export (-allowProvisioningUpdates) la remplace par le Developer ID et son profil.
+# Aucun appareil à enregistrer dans le compte développeur.
+set -euo pipefail
+cd "$(dirname "$0")"
+
+TOOLS=/Volumes/SKYRIM/TOOLS
+DEST="${MSILENCE_INSTALL_DIR:-$HOME/Applications/Applications Personnelles}"
+VERSION="${VERSION:-1.0.0}"
+BUILD="$(git rev-list --count HEAD 2>/dev/null || echo 1)"
+
+# Socle et modules communs : copies reprises à chaque build.
+[ -f "$TOOLS/DESIGN/Socle/swift/Socle.swift" ] && cp "$TOOLS/DESIGN/Socle/swift/Socle.swift" "$TOOLS/DESIGN/Socle/swift/WindowPresent.swift" App/
+[ -f "$TOOLS/MAC/_tools/shared/Updater.swift" ] && cp "$TOOLS/MAC/_tools/shared/Updater.swift" "$TOOLS/MAC/_tools/shared/UpdaterView.swift" App/
+
+[ -f assets/mSILENCE.icns ] || { echo "icône absente : swift scripts/make_icon.swift puis iconutil" >&2; exit 1; }
+
+xcodegen generate --quiet
+rm -rf build
+xcodebuild -project mSILENCE.xcodeproj -scheme mSILENCE -configuration Release -destination 'generic/platform=macOS' \
+    -archivePath build/mSILENCE.xcarchive MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$BUILD" \
+    CODE_SIGNING_ALLOWED=NO archive -quiet
+
+A=build/mSILENCE.xcarchive/Products/Applications/mSILENCE.app
+EXT="$A/Contents/Library/SystemExtensions/fr.stephan.msilence.extension.systemextension"
+codesign --force -s - --options runtime --entitlements Extension/Extension.entitlements "$EXT"
+codesign --force -s - --options runtime --entitlements App/mSILENCE.entitlements "$A"
+
+xcodebuild -exportArchive -archivePath build/mSILENCE.xcarchive -exportPath build/export \
+    -exportOptionsPlist scripts/ExportOptions.plist -allowProvisioningUpdates -quiet
+codesign --verify --deep --strict build/export/mSILENCE.app
+echo "OK : build/export/mSILENCE.app"
+
+if [ "${NO_INSTALL:-0}" != 1 ]; then
+    mkdir -p "$DEST"
+    osascript -e 'tell application id "fr.stephan.msilence" to quit' 2>/dev/null || true
+    rm -rf "$DEST/mSILENCE.app"
+    ditto build/export/mSILENCE.app "$DEST/mSILENCE.app"
+    echo "Installée : $DEST/mSILENCE.app"
+fi

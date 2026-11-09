@@ -1,0 +1,81 @@
+name: mSILENCE
+options:
+  bundleIdPrefix: fr.stephan
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    DEVELOPMENT_TEAM: 35KLMK53PN
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    ENABLE_HARDENED_RUNTIME: YES
+    ONLY_ACTIVE_ARCH: NO
+    ARCHS: "arm64 x86_64"
+targets:
+  mSILENCE:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+      - path: Shared
+      - path: Resources
+        excludes: ["**/.DS_Store"]
+      - path: assets/mSILENCE.icns
+        buildPhase: resources
+    entitlements:
+      path: App/mSILENCE.entitlements
+      properties:
+        com.apple.developer.system-extension.install: true
+        com.apple.developer.networking.networkextension: [content-filter-provider-systemextension]
+        com.apple.security.application-groups: ["35KLMK53PN.fr.stephan.msilence"]
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleName: mSILENCE
+        CFBundleDisplayName: mSILENCE
+        CFBundleIconFile: mSILENCE
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [fr, en, es, it]
+        LSMinimumSystemVersion: "14.0"
+        NSHumanReadableCopyright: "© 2026 Starbudweiser"
+        LSApplicationCategoryType: public.app-category.utilities
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: fr.stephan.msilence
+        PRODUCT_NAME: mSILENCE
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - target: Extension
+        embed: true
+        codeSign: true
+  Extension:
+    type: system-extension
+    platform: macOS
+    sources:
+      - path: Extension
+      - path: Shared
+    entitlements:
+      path: Extension/Extension.entitlements
+      properties:
+        com.apple.developer.networking.networkextension: [content-filter-provider-systemextension]
+        com.apple.security.application-groups: ["35KLMK53PN.fr.stephan.msilence"]
+    info:
+      path: Extension/Info.plist
+      properties:
+        CFBundleName: fr.stephan.msilence.extension
+        CFBundleDisplayName: mSILENCE
+        CFBundlePackageType: SYSX
+        NSSystemExtensionUsageDescription: mSILENCE filtre les connexions réseau des applis bloquées.
+        NetworkExtension:
+          NEProviderClasses:
+            com.apple.networkextension.filter-data: $(PRODUCT_MODULE_NAME).FilterDataProvider
+          NEMachServiceName: 35KLMK53PN.fr.stephan.msilence.xpc
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: fr.stephan.msilence.extension
+        PRODUCT_NAME: fr.stephan.msilence.extension
+        SKIP_INSTALL: YES
+        GENERATE_INFOPLIST_FILE: NO
