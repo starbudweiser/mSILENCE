@@ -52,4 +52,9 @@ if [ "${NO_INSTALL:-0}" != 1 ]; then
     rm -rf "$DEST/mSILENCE.app"
     ditto build/export/mSILENCE.app "$DEST/mSILENCE.app"
     echo "Installée : $DEST/mSILENCE.app"
+    # Lien dans Applications Personnelles (là où je lance mes applis) vers la vraie appli, qui doit rester dans /Applications.
+    if [ "$DEST" = /Applications ]; then
+        mkdir -p "$HOME/Applications/Applications Personnelles"
+        ln -sfn /Applications/mSILENCE.app "$HOME/Applications/Applications Personnelles/mSILENCE.app"
+    fi
 fi
