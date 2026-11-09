@@ -16,6 +16,7 @@ final class FirewallController: NSObject, ObservableObject {
     private var lastEvent = Date.distantPast
     private var paths: [String] = []
     private var poller: Timer?
+    private var upgradeRequested = false
 
     // MARK: État
 
@@ -28,6 +29,13 @@ final class FirewallController: NSObject, ObservableObject {
                 if let error { self.state = .failed(error.localizedDescription); return }
                 if self.state == .installing || self.state == .needsApproval { return }
                 self.state = (mgr.providerConfiguration != nil && mgr.isEnabled) ? .active : .notInstalled
+                // Au lancement, le filtre reprend la liste actuelle si elle a changé hors de l'appli.
+                let current = (mgr.providerConfiguration?.vendorConfiguration?[Shared.rulesKey] as? [String]) ?? []
+                if self.state == .active {
+                    if !self.upgradeRequested { self.upgradeRequested = true; self.install(paths: self.paths) }   // met l'extension à jour si l'appli est plus récente
+                    self.sendRules()
+                    if Set(current) != Set(self.paths) { self.saveConfiguration() }
+                }
             }
         }
     }
@@ -57,6 +65,7 @@ final class FirewallController: NSObject, ObservableObject {
     func push(paths: [String]) {
         self.paths = paths
         guard state == .active else { return }
+        sendRules()
         saveConfiguration()
     }
 
@@ -81,6 +90,7 @@ final class FirewallController: NSObject, ObservableObject {
                             ? .needsApproval : .failed(error.localizedDescription)
                     } else {
                         self.state = .active
+                        self.sendRules()
                     }
                 }
             }
@@ -97,8 +107,13 @@ final class FirewallController: NSObject, ObservableObject {
 
     func stopMonitoring() { poller?.invalidate(); poller = nil }
 
-    private func poll() {
-        guard state == .active else { return }
+    /// Envoie la liste au filtre déjà en marche (effet immédiat) ; la configuration enregistrée la rétablit au redémarrage.
+    private func sendRules() {
+        guard state == .active, let proxy = remote() else { return }
+        proxy.setBlocked(paths) {}
+    }
+
+    private func remote() -> FilterXPC? {
         if connection == nil {
             let c = NSXPCConnection(machServiceName: Shared.machService, options: [])
             c.remoteObjectInterface = NSXPCInterface(with: FilterXPC.self)
@@ -107,10 +122,14 @@ final class FirewallController: NSObject, ObservableObject {
             c.resume()
             connection = c
         }
-        let proxy = connection?.remoteObjectProxyWithErrorHandler { [weak self] _ in
+        return connection?.remoteObjectProxyWithErrorHandler { [weak self] _ in
             Task { @MainActor in self?.connection?.invalidate(); self?.connection = nil }
         } as? FilterXPC
-        proxy?.recentEvents(since: lastEvent) { data in
+    }
+
+    private func poll() {
+        guard state == .active, let proxy = remote() else { return }
+        proxy.recentEvents(since: lastEvent) { data in
             guard let list = try? JSONDecoder().decode([FlowEvent].self, from: data), !list.isEmpty else { return }
             Task { @MainActor in
                 self.lastEvent = list.map(\.date).max() ?? self.lastEvent

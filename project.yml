@@ -35,6 +35,8 @@ targets:
       path: App/Info.plist
       properties:
         CFBundleName: mSILENCE
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         CFBundleDisplayName: mSILENCE
         CFBundleIconFile: mSILENCE
         CFBundleDevelopmentRegion: en
@@ -66,6 +68,8 @@ targets:
       path: Extension/Info.plist
       properties:
         CFBundleName: fr.stephan.msilence.extension
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         CFBundleDisplayName: mSILENCE
         CFBundlePackageType: SYSX
         NSSystemExtensionUsageDescription: mSILENCE filtre les connexions réseau des applis bloquées.

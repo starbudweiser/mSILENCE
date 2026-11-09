@@ -5,6 +5,9 @@
 "status.installing" = "Installing…";
 "status.approval" = "Approval needed";
 "status.failed" = "Error";
+"firewall.toggle" = "Firewall";
+"status.paused" = "Firewall paused";
+"blocked.delete" = "Delete";
 "status.off" = "Firewall off";
 "blocked.title" = "Blocked applications";
 "blocked.subtitle" = "These apps can no longer reach the Internet. Traffic to and from this Mac stays allowed.";
@@ -29,7 +32,7 @@
 "settings.firewall" = "Firewall";
 "settings.firewall.hint" = "The filter runs in the background, with no window or notification, even when mSILENCE is closed. No data leaves this Mac.";
 "settings.install" = "Install the network filter";
-"settings.disable" = "Turn the firewall off";
+"settings.disable" = "Turn the network filter off";
 "settings.import" = "Radio Silence";
 "settings.import.hint" = "Brings in Radio Silence's list of blocked apps. Its license and other settings are not imported, and nothing is changed in Radio Silence.";
 "settings.import.button" = "Import the Radio Silence configuration";

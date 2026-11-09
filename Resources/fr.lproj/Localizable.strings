@@ -5,6 +5,9 @@
 "status.installing" = "Installation…";
 "status.approval" = "Autorisation requise";
 "status.failed" = "Erreur";
+"firewall.toggle" = "Pare-feu";
+"status.paused" = "Pare-feu désactivé";
+"blocked.delete" = "Supprimer";
 "status.off" = "Pare-feu inactif";
 "blocked.title" = "Applications bloquées";
 "blocked.subtitle" = "Ces applis ne peuvent plus se connecter à Internet. Les échanges avec ce Mac restent permis.";
@@ -29,7 +32,7 @@
 "settings.firewall" = "Pare-feu";
 "settings.firewall.hint" = "Le filtre tourne en arrière-plan, sans fenêtre ni notification, même quand mSILENCE est fermé. Aucune donnée ne quitte ce Mac.";
 "settings.install" = "Installer le filtre réseau";
-"settings.disable" = "Désactiver le pare-feu";
+"settings.disable" = "Désactiver le filtre réseau";
 "settings.import" = "Radio Silence";
 "settings.import.hint" = "Reprend la liste d'applis bloquées de Radio Silence. Sa licence et ses autres réglages ne sont pas repris, et rien n'est modifié dans Radio Silence.";
 "settings.import.button" = "Importer la configuration de Radio Silence";

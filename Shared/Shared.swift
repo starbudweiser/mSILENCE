@@ -23,4 +23,6 @@ struct FlowEvent: Codable, Identifiable, Hashable {
 
 @objc protocol FilterXPC {
     func recentEvents(since: Date, reply: @escaping (Data) -> Void)
+    /// Remplace la liste des chemins bloqués, sans redémarrer le filtre.
+    func setBlocked(_ paths: [String], reply: @escaping () -> Void)
 }

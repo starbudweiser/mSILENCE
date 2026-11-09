@@ -24,7 +24,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         rules.onChange = { [weak self] paths in self?.firewall.push(paths: paths) }
-        firewall.refresh(paths: rules.paths)
+        firewall.refresh(paths: rules.activePaths)
         showWindow(quietly: args.contains("--discret"))
 
         let updates = UpdateEngine.shared

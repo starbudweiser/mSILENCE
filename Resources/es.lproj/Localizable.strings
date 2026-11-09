@@ -5,6 +5,9 @@
 "status.installing" = "Instalando…";
 "status.approval" = "Autorización necesaria";
 "status.failed" = "Error";
+"firewall.toggle" = "Cortafuegos";
+"status.paused" = "Cortafuegos desactivado";
+"blocked.delete" = "Eliminar";
 "status.off" = "Cortafuegos inactivo";
 "blocked.title" = "Aplicaciones bloqueadas";
 "blocked.subtitle" = "Estas apps ya no pueden conectarse a Internet. Los intercambios con este Mac siguen permitidos.";
@@ -29,7 +32,7 @@
 "settings.firewall" = "Cortafuegos";
 "settings.firewall.hint" = "El filtro funciona en segundo plano, sin ventana ni notificación, incluso con mSILENCE cerrado. Ningún dato sale de este Mac.";
 "settings.install" = "Instalar el filtro de red";
-"settings.disable" = "Desactivar el cortafuegos";
+"settings.disable" = "Desactivar el filtro de red";
 "settings.import" = "Radio Silence";
 "settings.import.hint" = "Importa la lista de apps bloqueadas de Radio Silence. Su licencia y demás ajustes no se importan, y no se modifica nada en Radio Silence.";
 "settings.import.button" = "Importar la configuración de Radio Silence";

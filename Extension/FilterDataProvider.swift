@@ -112,6 +112,11 @@ extension FilterDataProvider: NSXPCListenerDelegate, FilterXPC {
         return true
     }
 
+    func setBlocked(_ paths: [String], reply: @escaping () -> Void) {
+        lock.lock(); blocked = paths; lock.unlock()
+        reply()
+    }
+
     func recentEvents(since: Date, reply: @escaping (Data) -> Void) {
         lock.lock(); let list = events.filter { $0.date > since }; lock.unlock()
         reply((try? JSONEncoder().encode(list)) ?? Data())

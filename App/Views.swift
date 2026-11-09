@@ -35,7 +35,11 @@ struct RootView: View {
                 Text("mSILENCE").socle(Socle.T.heading).foregroundStyle(Socle.C.textStrong)
                 SocleSegmented(options: Tab.allCases, selection: tab, label: \.title) { tab = $0 }
                 Spacer()
-                StatusBadge(state: fw.state)
+                StatusBadge(state: fw.state, paused: !rules.globalEnabled)
+                Toggle(isOn: Binding(get: { rules.globalEnabled }, set: { rules.setGlobal($0) })) {
+                    Text(L("firewall.toggle")).socle(Socle.T.label).foregroundStyle(Socle.C.text)
+                }
+                .toggleStyle(.switch).controlSize(.small).tint(Socle.C.accentFill)
             }
             .padding(.horizontal, Socle.M.space6)
             .frame(height: Socle.M.sizeBar + 12)
@@ -58,8 +62,10 @@ struct RootView: View {
 
 struct StatusBadge: View {
     let state: FirewallController.State
+    var paused = false
     var body: some View {
         let (text, color): (String, Color) = switch state {
+        case .active where paused: (L("status.paused"), Socle.C.warning)
         case .active: (L("status.active"), Socle.C.success)
         case .installing: (L("status.installing"), Socle.C.warning)
         case .needsApproval: (L("status.approval"), Socle.C.warning)
@@ -101,7 +107,8 @@ struct BlockedView: View {
                     ScrollView {
                         VStack(spacing: 0) {
                             ForEach(rules.apps) { app in
-                                BlockedRow(app: app) { rules.remove(app.path) }
+                                BlockedRow(app: app, paused: !rules.globalEnabled,
+                                           onToggle: { rules.setEnabled(app.path, $0) }, onRemove: { rules.remove(app.path) })
                                 if app.id != rules.apps.last?.id { Rectangle().fill(Socle.C.borderSubtle).frame(height: 1) }
                             }
                         }
@@ -136,9 +143,13 @@ struct BlockedView: View {
 
 struct BlockedRow: View {
     let app: BlockedApp
+    let paused: Bool
+    let onToggle: (Bool) -> Void
     let onRemove: () -> Void
     var body: some View {
         HStack(spacing: Socle.M.space3) {
+            Toggle("", isOn: Binding(get: { app.enabled }, set: onToggle))
+                .labelsHidden().toggleStyle(.switch).controlSize(.small).tint(Socle.C.accentFill)
             Image(nsImage: Icons.icon(app.path)).resizable().frame(width: 32, height: 32).opacity(app.exists ? 1 : 0.4)
             VStack(alignment: .leading, spacing: 2) {
                 Text(app.name).socle(Socle.T.label).foregroundStyle(Socle.C.textStrong)
@@ -147,9 +158,10 @@ struct BlockedRow: View {
                 if !app.exists { Text(L("blocked.missing")).socle(Socle.T.meta).foregroundStyle(Socle.C.warning) }
             }
             Spacer(minLength: Socle.M.space3)
-            Button(L("blocked.unblock"), action: onRemove).buttonStyle(SocleButtonStyle(.secondary, height: Socle.M.sizeControl)).fixedSize()
+            Button(L("blocked.delete"), action: onRemove).buttonStyle(SocleButtonStyle(.secondary, height: Socle.M.sizeControl)).fixedSize()
         }
         .padding(.horizontal, Socle.M.space4).padding(.vertical, Socle.M.space2_5)
+        .opacity(app.enabled && !paused ? 1 : 0.55)
     }
 }
 
@@ -170,7 +182,7 @@ struct FirewallNotice: View {
                     }.buttonStyle(SocleButtonStyle(.secondary, height: Socle.M.sizeControl)).fixedSize()
                 case .installing: EmptyView()
                 default:
-                    Button(L("settings.install")) { fw.install(paths: rules.paths) }
+                    Button(L("settings.install")) { fw.install(paths: rules.activePaths) }
                         .buttonStyle(SocleButtonStyle(.primary, height: Socle.M.sizeControl)).fixedSize()
                 }
             }
@@ -265,7 +277,7 @@ struct MonitorView: View {
                 }
             }
             if blocked {
-                Button(L("blocked.unblock")) { rules.remove(g.path) }.buttonStyle(SocleButtonStyle(.secondary, height: Socle.M.sizeControl)).fixedSize()
+                Button(L("blocked.unblock")) { rules.setEnabled(rules.apps.first { $0.path == g.path || resolvedPath($0.path) == g.path }?.path ?? g.path, false) }.buttonStyle(SocleButtonStyle(.secondary, height: Socle.M.sizeControl)).fixedSize()
             } else {
                 Button(L("monitor.block")) { rules.add([g.path]) }.buttonStyle(SocleButtonStyle(.primary, height: Socle.M.sizeControl)).fixedSize()
             }
@@ -287,12 +299,12 @@ struct SettingsView: View {
             VStack(spacing: Socle.M.space4) {
                 card(L("settings.firewall")) {
                     HStack {
-                        StatusBadge(state: fw.state)
+                        StatusBadge(state: fw.state, paused: !rules.globalEnabled)
                         Spacer()
                         if fw.state == .active {
                             Button(L("settings.disable")) { fw.disable() }.buttonStyle(SocleButtonStyle(.secondary, height: Socle.M.sizeControl)).fixedSize()
                         } else if fw.state != .installing {
-                            Button(L("settings.install")) { fw.install(paths: rules.paths) }
+                            Button(L("settings.install")) { fw.install(paths: rules.activePaths) }
                                 .buttonStyle(SocleButtonStyle(.primary, height: Socle.M.sizeControl)).fixedSize()
                         }
                     }
