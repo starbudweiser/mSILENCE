@@ -4,7 +4,12 @@
 
 ## About
 
-mSILENCE is a personal, independent per-app firewall and network monitor for macOS, inspired by [Radio Silence](https://radiosilenceapp.com/). It is not affiliated with Radio Silence or its author, and contains none of its code. © 2026 Starbudweiser, MIT license.
+Personal, independent per-app firewall and network monitor for macOS, inspired by [Radio Silence](https://radiosilenceapp.com/).
+
+- **Authors:** Starbudweiser & Claude Code (Anthropic).
+- **License:** MIT. © 2026 Starbudweiser.
+- **Disclaimer:** provided as is, without warranty. Not affiliated with Radio Silence or its author; it contains none of its code.
+- **In the app:** the *About mSILENCE* entry of the app menu.
 
 ## Features
 

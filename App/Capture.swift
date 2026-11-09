@@ -15,7 +15,7 @@ enum Capture {
 
     static func main(rules: RuleStore, fw: FirewallController, tab: Tab, path: String) {
         let view = NSHostingView(rootView: RootView(rules: rules, fw: fw, tab: tab))
-        view.frame = NSRect(x: 0, y: 0, width: 800, height: 625)
+        view.frame = NSRect(x: 0, y: 0, width: 960, height: 625)
         let window = NSWindow(contentRect: view.frame, styleMask: [.borderless], backing: .buffered, defer: false)
         window.appearance = NSAppearance(named: .darkAqua)
         window.contentView = view

@@ -52,6 +52,6 @@
 "about.menu" = "Informazioni su mSILENCE";
 "about.version" = "Versione %@ (%@)";
 "about.tagline" = "Firewall per app su Mac: blocca le app che si connettono senza il tuo consenso.";
-"about.authors" = "Stéphan Le Gac Savoye";
-"about.license" = "Licenza MIT.";
-"about.disclaimer" = "Versione personale e indipendente: non affiliata a Radio Silence né al suo autore.";
+"about.authors" = "Starbudweiser & Claude Code (Anthropic)";
+"about.license" = "Licenza MIT. © 2026 Starbudweiser.";
+"about.disclaimer" = "Fornito così com'è, senza garanzia. Ispirato a Radio Silence, senza legami con i suoi autori.";

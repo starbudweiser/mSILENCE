@@ -4,12 +4,27 @@ import UniformTypeIdentifiers
 
 enum Tab: Hashable, CaseIterable {
     case blocked, monitor, settings
+    var icon: String {
+        switch self {
+        case .blocked: "nosign"
+        case .monitor: "waveform.path.ecg"
+        case .settings: "gearshape"
+        }
+    }
     var title: String {
         switch self {
         case .blocked: L("tab.blocked")
         case .monitor: L("tab.monitor")
         case .settings: L("tab.settings")
         }
+    }
+}
+
+/// Survol d'une ligne de liste : `surface-hover`.
+struct HoverBackground: ViewModifier {
+    @State private var hover = false
+    func body(content: Content) -> some View {
+        content.background(hover ? Socle.C.surfaceHover : Color.clear).onHover { hover = $0 }
     }
 }
 
@@ -33,7 +48,6 @@ struct RootView: View {
         VStack(spacing: 0) {
             HStack(spacing: Socle.M.space4) {
                 Text("mSILENCE").socle(Socle.T.heading).foregroundStyle(Socle.C.textStrong)
-                SocleSegmented(options: Tab.allCases, selection: tab, label: \.title) { tab = $0 }
                 Spacer()
                 StatusBadge(state: fw.state, paused: !rules.globalEnabled)
                 Toggle(isOn: Binding(get: { rules.globalEnabled }, set: { rules.setGlobal($0) })) {
@@ -45,18 +59,82 @@ struct RootView: View {
             .frame(height: Socle.M.sizeBar + 12)
             .background(Socle.C.surfaceRaised)
             Rectangle().fill(Socle.C.border).frame(height: 1)
-            Group {
-                switch tab {
-                case .blocked: BlockedView(rules: rules, fw: fw)
-                case .monitor: MonitorView(rules: rules, fw: fw)
-                case .settings: SettingsView(rules: rules, fw: fw)
+            HStack(spacing: 0) {
+                Sidebar(tab: $tab)
+                Rectangle().fill(Socle.C.border).frame(width: 1)
+                Group {
+                    switch tab {
+                    case .blocked: BlockedView(rules: rules, fw: fw)
+                    case .monitor: MonitorView(rules: rules, fw: fw)
+                    case .settings: SettingsView(rules: rules, fw: fw)
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .background(Socle.C.bg)
-        .frame(minWidth: 720, minHeight: 520)
+        .frame(minWidth: 860, minHeight: 520)
         .onChange(of: tab) { _, t in t == .monitor ? fw.startMonitoring() : fw.stopMonitoring() }
+    }
+}
+
+/// Barre latérale Socle : navigation, avec en filigrane le motif de l'icône (une teinte, 5 %, 130 % de la colonne, posé en bas, coupé à droite et en bas).
+struct Sidebar: View {
+    @Binding var tab: Tab
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            ForEach(Tab.allCases, id: \.self) { t in
+                let on = t == tab
+                Button { tab = t } label: {
+                    HStack(spacing: Socle.M.space1_5) {
+                        Image(systemName: t.icon).font(.system(size: 13)).frame(width: 16, height: 16)
+                        Text(t.title).socle(Socle.T.label)
+                        Spacer(minLength: 0)
+                    }
+                    .foregroundStyle(on ? Socle.C.textStrong : Socle.C.textMuted)
+                    .padding(.horizontal, Socle.M.space2_5)
+                    .frame(height: Socle.M.sizeControl)
+                    .background(on ? Socle.C.surfaceSelected : Color.clear, in: RoundedRectangle(cornerRadius: Socle.M.radius))
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(Socle.M.space3)
+        .frame(width: Socle.M.sizeSidebarMin)
+        .frame(maxHeight: .infinity)
+        .background(alignment: .bottomTrailing) {
+            Watermark()
+                .frame(width: Socle.M.sizeSidebarMin * 1.3, height: Socle.M.sizeSidebarMin * 1.3)
+                .offset(x: Socle.M.sizeSidebarMin * 0.18, y: Socle.M.sizeSidebarMin * 0.22)
+                .allowsHitTesting(false).accessibilityHidden(true)
+        }
+        .background(Socle.C.surfaceRaised)
+        .clipped()
+    }
+}
+
+/// Motif de l'icône (ondes barrées) sans son carré de fond, d'une seule teinte : `text-strong` à 5 %.
+struct Watermark: View {
+    var body: some View {
+        Canvas { ctx, size in
+            let k = size.width / 1024
+            func pt(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: x * k, y: (1024 - y) * k) }
+            let c = pt(512, 330)
+            var path = Path()
+            for r in [110.0, 255.0, 400.0] as [CGFloat] {
+                path.addArc(center: c, radius: r * k, startAngle: .degrees(-90 - 50.4), endAngle: .degrees(-90 + 50.4), clockwise: false)
+            }
+            ctx.stroke(path, with: .color(.white), style: StrokeStyle(lineWidth: 70 * k, lineCap: .round))
+            ctx.fill(Path(ellipseIn: CGRect(x: c.x - 52 * k, y: c.y - 52 * k, width: 104 * k, height: 104 * k)), with: .color(.white))
+            var slash = Path(); slash.move(to: pt(270, 760)); slash.addLine(to: pt(754, 270))
+            ctx.stroke(slash, with: .color(.white), style: StrokeStyle(lineWidth: 66 * k, lineCap: .round))
+        }
+        .compositingGroup()
+        .colorMultiply(Socle.C.textStrong)
+        .opacity(0.05)
     }
 }
 
@@ -154,15 +232,16 @@ struct BlockedRow: View {
             Image(nsImage: Icons.icon(app.path)).resizable().frame(width: 32, height: 32).opacity(app.exists ? 1 : 0.4)
             VStack(alignment: .leading, spacing: 2) {
                 Text(app.name).socle(Socle.T.label).foregroundStyle(Socle.C.textStrong)
-                Text(app.exists ? app.path : "\(L("blocked.missing")) · \(app.path)").socle(Socle.T.meta)
-                    .foregroundStyle(app.exists ? Socle.C.accentText : Socle.C.warning).lineLimit(1).truncationMode(.middle)
+                Text(app.exists ? app.path : "\(L("blocked.missing")) · \(app.path)").socle(Socle.T.monoSm)
+                    .foregroundStyle(app.exists ? Socle.C.accentText : Socle.C.warning).lineLimit(2).fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: Socle.M.space3)
             Button(L("blocked.delete"), action: onRemove).buttonStyle(SocleButtonStyle(.secondary, height: Socle.M.sizeControl)).fixedSize()
         }
         .padding(.horizontal, Socle.M.space4)
         .frame(height: Self.rowHeight)   // même hauteur pour toutes les lignes, contenu centré
-        .opacity(app.enabled && !paused ? 1 : 0.55)
+        .opacity(app.enabled && !paused ? 1 : Socle.M.opacityDisabled)
+        .modifier(HoverBackground())
     }
 }
 
@@ -173,8 +252,8 @@ struct FirewallNotice: View {
     @ObservedObject var rules: RuleStore
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Socle.M.space2) {
-            Text(message).socle(Socle.T.body).foregroundStyle(Socle.C.warningSoft)
+        VStack(alignment: .center, spacing: Socle.M.space3) {
+            Text(message).socle(Socle.T.body).foregroundStyle(Socle.C.warningSoft).multilineTextAlignment(.center)
             HStack {
                 switch state {
                 case .needsApproval:
@@ -188,8 +267,8 @@ struct FirewallNotice: View {
                 }
             }
         }
-        .padding(Socle.M.space4)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(Socle.M.space6)
+        .frame(maxWidth: .infinity)
         .background(Socle.C.warningBg, in: RoundedRectangle(cornerRadius: Socle.M.radiusMd))
         .overlay(RoundedRectangle(cornerRadius: Socle.M.radiusMd).stroke(Socle.C.warningBorder, lineWidth: 1))
     }
@@ -267,12 +346,12 @@ struct MonitorView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(((g.path as NSString).lastPathComponent as NSString).deletingPathExtension)
                     .socle(Socle.T.label).foregroundStyle(Socle.C.textStrong)
-                Text(L("monitor.last", "\(g.last.host):\(g.last.port)", g.last.proto)).socle(Socle.T.meta)
+                Text(L("monitor.last", "\(g.last.host):\(g.last.port)", g.last.proto)).socle(Socle.T.monoSm)
                     .foregroundStyle(Socle.C.accentText).lineLimit(1).truncationMode(.middle)
             }
             Spacer(minLength: Socle.M.space3)
             VStack(alignment: .trailing, spacing: 2) {
-                Text(L("monitor.connections", g.count)).socle(Socle.T.meta).foregroundStyle(Socle.C.textMuted)
+                Text(L("monitor.connections", g.count)).socle(Socle.T.meta).monospacedDigit().foregroundStyle(Socle.C.textMuted)
                 if g.blockedCount > 0 {
                     Text(L("monitor.dropped", g.blockedCount)).socle(Socle.T.meta).foregroundStyle(Socle.C.danger)
                 }
@@ -285,6 +364,7 @@ struct MonitorView: View {
         }
         .padding(.horizontal, Socle.M.space4)
         .frame(height: BlockedRow.rowHeight)
+        .modifier(HoverBackground())
     }
 }
 
@@ -298,7 +378,7 @@ struct SettingsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: Socle.M.space4) {
+            SocleModuleGrid {
                 card(L("settings.firewall")) {
                     HStack {
                         StatusBadge(state: fw.state, paused: !rules.globalEnabled)
@@ -310,10 +390,10 @@ struct SettingsView: View {
                                 .buttonStyle(SocleButtonStyle(.primary, height: Socle.M.sizeControl)).fixedSize()
                         }
                     }
-                    Text(L("settings.firewall.hint")).socle(Socle.T.body).foregroundStyle(Socle.C.textMuted)
+                    Text(L("settings.firewall.hint")).socle(Socle.T.body).foregroundStyle(Socle.C.accentText)
                 }
                 card(L("settings.import")) {
-                    Text(L("settings.import.hint")).socle(Socle.T.body).foregroundStyle(Socle.C.textMuted)
+                    Text(L("settings.import.hint")).socle(Socle.T.body).foregroundStyle(Socle.C.accentText)
                     HStack {
                         Button(L("settings.import.button")) {
                             if let list = RadioSilenceImport.blacklist() {
@@ -330,9 +410,7 @@ struct SettingsView: View {
                         .buttonStyle(SocleButtonStyle(.secondary, height: Socle.M.sizeControl)).fixedSize()
                 }
             }
-            .frame(maxWidth: 720)
             .padding(Socle.M.space6 + 4)
-            .frame(maxWidth: .infinity)
         }
     }
 
@@ -345,5 +423,6 @@ struct SettingsView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Socle.C.surface, in: RoundedRectangle(cornerRadius: Socle.M.radiusLg))
         .overlay(RoundedRectangle(cornerRadius: Socle.M.radiusLg).stroke(Socle.C.border, lineWidth: 1))
+        .socleModule()
     }
 }

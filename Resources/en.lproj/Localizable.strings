@@ -52,6 +52,6 @@
 "about.menu" = "About mSILENCE";
 "about.version" = "Version %@ (%@)";
 "about.tagline" = "Per-app firewall for Mac: blocks apps that connect without your consent.";
-"about.authors" = "Stéphan Le Gac Savoye";
-"about.license" = "MIT license.";
-"about.disclaimer" = "Personal, independent version: not affiliated with Radio Silence or its author.";
+"about.authors" = "Starbudweiser & Claude Code (Anthropic)";
+"about.license" = "MIT license. © 2026 Starbudweiser.";
+"about.disclaimer" = "Provided as is, without warranty. Inspired by Radio Silence, not affiliated with its authors.";

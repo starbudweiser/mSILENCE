@@ -6,6 +6,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let rules = RuleStore()
     let firewall = FirewallController()
     private var window: NSWindow?
+    private var centered = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         Socle.apply()
@@ -43,16 +44,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showWindow(quietly: Bool) {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 800, height: 625),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 960, height: 625),
                              styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
             w.title = "mSILENCE"
             w.isReleasedWhenClosed = false
             w.contentView = NSHostingView(rootView: RootView(rules: rules, fw: firewall))
-            w.setFrameAutosaveName("mSILENCE.main")
-            if !w.setFrameUsingName("mSILENCE.main") { w.center() }
+            w.setFrameAutosaveName("mSILENCE.main")   // la taille est mémorisée ; la position ne l'est jamais (règle Socle « Lancement centré »)
+            w.setFrameUsingName("mSILENCE.main")
+            if let zone = (NSScreen.screens.first { NSMouseInRect(NSEvent.mouseLocation, $0.frame, false) } ?? NSScreen.main)?.visibleFrame {
+                var size = w.frame.size
+                size.width = min(size.width, zone.width); size.height = min(size.height, zone.height)
+                w.setContentSize(w.contentRect(forFrameRect: NSRect(origin: .zero, size: size)).size)
+            }
+            w.socleCenter()
             window = w
         }
         if quietly { window?.orderBack(nil) } else { window?.present() }
+        if !centered {   // la taille définitive (barre de titre comprise) n'est connue qu'une fois la fenêtre affichée : on recentre alors
+            centered = true
+            DispatchQueue.main.async { [weak self] in self?.window?.socleCenter() }
+        }
     }
 
     // MARK: Menus (le nom de l'appli reste en texte normal dans les menus)
@@ -61,10 +72,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let main = NSMenu()
         let appItem = NSMenuItem()
         let appMenu = NSMenu()
-        appMenu.addItem(withTitle: L("about.menu"), action: #selector(showAbout), keyEquivalent: "").target = self
-        appMenu.addItem(.separator())
         appMenu.addItem(withTitle: L("menu.hide"), action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
         appMenu.addItem(.separator())
+        appMenu.addItem(withTitle: L("about.menu"), action: #selector(showAbout), keyEquivalent: "").target = self   // Socle : juste au-dessus de « Quitter »
         appMenu.addItem(withTitle: L("menu.quit"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         appItem.submenu = appMenu
         main.addItem(appItem)

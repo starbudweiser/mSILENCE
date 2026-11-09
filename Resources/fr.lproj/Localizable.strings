@@ -52,6 +52,6 @@
 "about.menu" = "À propos de mSILENCE";
 "about.version" = "Version %@ (%@)";
 "about.tagline" = "Pare-feu par application pour Mac : bloque les applis qui se connectent sans votre accord.";
-"about.authors" = "Stéphan Le Gac Savoye";
-"about.license" = "Licence MIT.";
-"about.disclaimer" = "Version personnelle, indépendante : non affiliée à Radio Silence ni à son auteur.";
+"about.authors" = "Starbudweiser & Claude Code (Anthropic)";
+"about.license" = "Licence MIT. © 2026 Starbudweiser.";
+"about.disclaimer" = "Fourni en l'état, sans garantie. Inspiré de Radio Silence, sans lien avec ses auteurs.";
