@@ -43,7 +43,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showWindow(quietly: Bool) {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 780, height: 580),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 800, height: 625),
                              styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
             w.title = "mSILENCE"
             w.isReleasedWhenClosed = false
