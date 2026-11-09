@@ -176,13 +176,14 @@ struct BlockedView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Socle.M.space4) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .center) {   // titre et bouton centrés l'un sur l'autre ; le sous-titre prend toute la largeur dessous
                     Text(L("blocked.title")).socle(Socle.T.title).foregroundStyle(Socle.C.textStrong)
-                    Text(L("blocked.subtitle")).socle(Socle.T.body).foregroundStyle(Socle.C.accentText)
+                    Spacer()
+                    Button(L("blocked.add")) { Self.choose(rules) }.buttonStyle(SocleButtonStyle(.action)).fixedSize()
                 }
-                Spacer()
-                Button(L("blocked.add")) { Self.choose(rules) }.buttonStyle(SocleButtonStyle(.action)).fixedSize()
+                Text(L("blocked.subtitle")).socle(Socle.T.body).foregroundStyle(Socle.C.accentText)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             if fw.state != .active { FirewallNotice(state: fw.state, fw: fw, rules: rules) }
             ZStack {
