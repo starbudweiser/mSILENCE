@@ -13,3 +13,4 @@ VERSION="$VERSION" NO_INSTALL=1 ./build_app.sh   # notarise et agrafe (notarize_
 python3 /Volumes/SKYRIM/TOOLS/MAC/_tools/release_notes.py mSILENCE "$VERSION" --sha "$DIST/mSILENCE.zip.sha256" -o "$DIST/notes.md"
 gh release create "v$VERSION" "$DIST/mSILENCE.zip" "$DIST/mSILENCE.zip.sha256" --title "mSILENCE $VERSION" --notes-file "$DIST/notes.md"
 rm -rf "$DIST"
+git fetch -q --tags origin || true          # l'étiquette de la publication numérote ensuite les builds locaux (build_app.sh)

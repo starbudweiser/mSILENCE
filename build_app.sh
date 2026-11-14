@@ -12,6 +12,9 @@ cd "$(dirname "$0")"
 TOOLS=/Volumes/SKYRIM/TOOLS
 # Exception à la règle « Applications Personnelles » : macOS n'active une extension système que si l'appli est dans /Applications.
 DEST="${MSILENCE_INSTALL_DIR:-/Applications}"
+# Sans VERSION, la version de la dernière publication (étiquette git vX.Y.Z) : une copie locale numérotée 1.0.0 serait
+# remplacée par la mise à jour automatique, même par une publication plus ancienne que son code (incident du 14/11/2026).
+VERSION="${VERSION:-$(git tag --list 'v[0-9]*' --sort=-v:refname 2>/dev/null | head -1 | sed 's/^v//')}"
 VERSION="${VERSION:-1.0.0}"
 # Numéro de build croissant à chaque compilation : macOS ne remplace une extension système que si son numéro de build change.
 BUILD="$(git rev-list --count HEAD 2>/dev/null || echo 1).$(date +%y%m%d%H%M)"
