@@ -8,6 +8,8 @@ mSILENCE is made by Starbudweiser & Claude Code (Anthropic). Part of the **DESKT
 
 Personal, independent per-app firewall and network monitor for macOS, inspired by [Radio Silence](https://radiosilenceapp.com/). Not affiliated with Radio Silence or its author; it contains none of its code.
 
+![The main window listing five blocked applications, with the firewall switched on.](docs/screenshot.png)
+
 ## Requirements and installation
 
 macOS 14 or later (Apple Silicon or Intel). Download `mSILENCE.zip` from the [Releases page](https://github.com/starbudweiser/mSILENCE/releases/latest), unzip it and move mSILENCE.app to `/Applications` (macOS only activates a system extension from there). The app is signed with a Developer ID and notarized.
