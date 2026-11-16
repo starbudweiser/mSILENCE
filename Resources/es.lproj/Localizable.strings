@@ -48,5 +48,6 @@
 "about.version" = "Versión %@ (%@)";
 "about.tagline" = "Cortafuegos por aplicación para Mac: bloquea las apps que se conectan sin su permiso.";
 "about.authors" = "Starbudweiser & Claude Code (Anthropic)";
+"about.collection" = "Forma parte del DESKTOP MAC TOOLKIT.";
 "about.license" = "Licencia MIT. © 2026 Starbudweiser.";
 "about.disclaimer" = "Se ofrece tal cual, sin garantía. Inspirado en Radio Silence, sin relación con sus autores.";

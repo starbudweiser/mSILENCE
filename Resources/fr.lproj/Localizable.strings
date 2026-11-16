@@ -48,5 +48,6 @@
 "about.version" = "Version %@ (%@)";
 "about.tagline" = "Pare-feu par application pour Mac : bloque les applis qui se connectent sans votre accord.";
 "about.authors" = "Starbudweiser & Claude Code (Anthropic)";
+"about.collection" = "Fait partie du DESKTOP MAC TOOLKIT.";
 "about.license" = "Licence MIT. © 2026 Starbudweiser.";
 "about.disclaimer" = "Fourni en l'état, sans garantie. Inspiré de Radio Silence, sans lien avec ses auteurs.";

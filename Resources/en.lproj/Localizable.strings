@@ -48,5 +48,6 @@
 "about.version" = "Version %@ (%@)";
 "about.tagline" = "Per-app firewall for Mac: blocks apps that connect without your consent.";
 "about.authors" = "Starbudweiser & Claude Code (Anthropic)";
+"about.collection" = "Part of the DESKTOP MAC TOOLKIT.";
 "about.license" = "MIT license. © 2026 Starbudweiser.";
 "about.disclaimer" = "Provided as is, without warranty. Inspired by Radio Silence, not affiliated with its authors.";

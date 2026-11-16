@@ -4,12 +4,15 @@
 
 ## About
 
-Personal, independent per-app firewall and network monitor for macOS, inspired by [Radio Silence](https://radiosilenceapp.com/).
+mSILENCE is made by Starbudweiser & Claude Code (Anthropic). Part of the **DESKTOP MAC TOOLKIT**. MIT License, © 2026 Starbudweiser. Provided as is, without warranty. "About mSILENCE" is in the app menu.
 
-- **Authors:** Starbudweiser & Claude Code (Anthropic).
-- **License:** MIT. © 2026 Starbudweiser.
-- **Disclaimer:** provided as is, without warranty. Not affiliated with Radio Silence or its author; it contains none of its code.
-- **In the app:** the *About mSILENCE* entry of the app menu.
+Personal, independent per-app firewall and network monitor for macOS, inspired by [Radio Silence](https://radiosilenceapp.com/). Not affiliated with Radio Silence or its author; it contains none of its code.
+
+## Requirements and installation
+
+macOS 14 or later (Apple Silicon or Intel). Download `mSILENCE.zip` from the [Releases page](https://github.com/starbudweiser/mSILENCE/releases/latest), unzip it and move mSILENCE.app to `/Applications` (macOS only activates a system extension from there). The app is signed with a Developer ID and notarized.
+
+On first launch, click **Install the network filter**, then allow mSILENCE in *System Settings › General › Login Items & Extensions › Network Extensions*.
 
 ## Features
 

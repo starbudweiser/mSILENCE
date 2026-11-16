@@ -2,6 +2,10 @@
 
 [English](README.md)
 
+**Fait partie du DESKTOP MAC TOOLKIT.** Licence MIT, © 2026 Starbudweiser. Fourni en l'état, sans garantie. « À propos de mSILENCE » est dans le menu de l'appli.
+
+Configuration requise : macOS 14 ou plus récent. Installation : télécharger `mSILENCE.zip` depuis la page [Releases](https://github.com/starbudweiser/mSILENCE/releases/latest), le décompresser et placer mSILENCE.app dans `/Applications`. Appli signée Developer ID et notarisée.
+
 Version personnelle et indépendante d'un pare-feu par application et moniteur réseau pour macOS, inspirée de [Radio Silence](https://radiosilenceapp.com/) (aucun code en commun, aucun lien avec son auteur).
 
 - **Bloquer une appli** : glisser-déposer ou choix dans une liste ; ses helpers et processus enfants sont bloqués avec elle, les échanges locaux restent permis.
