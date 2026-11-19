@@ -4,6 +4,13 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>fr</string>
+		<string>en</string>
+		<string>es</string>
+		<string>it</string>
+	</array>
 	<key>CFBundleDisplayName</key>
 	<string>mSILENCE</string>
 	<key>CFBundleExecutable</key>
@@ -21,7 +28,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSSystemExtensionUsageDescription</key>
-	<string>mSILENCE filtre les connexions réseau des applis bloquées.</string>
+	<string>mSILENCE filters the network connections of blocked apps.</string>
 	<key>NetworkExtension</key>
 	<dict>
 		<key>NEMachServiceName</key>

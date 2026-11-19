@@ -72,7 +72,8 @@ targets:
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         CFBundleDisplayName: mSILENCE
         CFBundlePackageType: SYSX
-        NSSystemExtensionUsageDescription: mSILENCE filtre les connexions réseau des applis bloquées.
+        CFBundleLocalizations: [fr, en, es, it]
+        NSSystemExtensionUsageDescription: mSILENCE filters the network connections of blocked apps.
         NetworkExtension:
           NEProviderClasses:
             com.apple.networkextension.filter-data: $(PRODUCT_MODULE_NAME).FilterDataProvider
