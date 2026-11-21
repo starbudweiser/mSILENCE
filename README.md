@@ -38,3 +38,9 @@ A network content filter needs Apple-signed entitlements, so the build is signed
 On first launch, click **Install the network filter**, then allow mSILENCE in *System Settings › General › Login Items & Extensions › Network Extensions*.
 
 Data: `~/Library/Application Support/mSILENCE/rules.json` (`MSILENCE_DATA_DIR` for tests). Offscreen checks, without opening any window: `mSILENCE --capture out.png [--tab monitor|settings] [--demo]`, `--capture-about out.png`, `--import-radio-silence`.
+
+## Support / Soutenir
+
+This app is free. If it is useful to you, you can support the project (optional, no reward expected): [GitHub Sponsors](https://github.com/sponsors/starbudweiser).
+
+Cette appli est gratuite. Si elle vous est utile, vous pouvez soutenir le projet (facultatif, sans contrepartie) : [GitHub Sponsors](https://github.com/sponsors/starbudweiser).
